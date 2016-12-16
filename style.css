@@ -1,14 +1,18 @@
 body { 
     margin: 0;
-    padding: 0;
+    padding: 10;
 }
 
 div#games {
+    margin: auto;
     padding: 10px;
-    width: 20%;
+    width: 80%;
     height: 80%;
-    position: absolute;
-    right: 0;
-    top: 0;
     background: #ccc;
+}
+
+div#games .game {
+    background: #ddd;
+    padding: 10px;
+    margin-bottom: 10px;
 }
