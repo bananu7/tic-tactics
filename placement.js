@@ -2,7 +2,7 @@ var placement = function (units, objects, container, placementContainer) {
   var picker = document.createElement('ul');
 
   var selectedUnit;
-  for (let unit of units) {
+  for (let unit of ['(remove)', ...units]) {
     var unitEl = document.createElement('li');
     unitEl.innerHTML = unit;
     unitEl.onclick = function () {
@@ -18,8 +18,14 @@ var placement = function (units, objects, container, placementContainer) {
         return;
       }
 
-      object.type = 'unit';
-      object.unitType = selectedUnit;
+      if (selectedUnit == '(remove)') {
+        object.type = 'marker';
+        delete object.unitType;
+      } else {
+        object.type = 'unit';
+        object.unitType = selectedUnit;
+      }
+
       /* XXX I'd like to find some CLEANER way than calling draw manually */
       draw(objects, container);
     };
