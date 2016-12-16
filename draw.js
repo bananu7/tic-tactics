@@ -20,17 +20,21 @@ var draw = function () {
   var renderers = {
     player: function (object, el) {
       el.style.backgroundColor = 'red';
+    },
+    monster: function (object, el) {
+      el.style.backgroundColor = 'green';
     }
   };
 
-  return function (objects) {
+  return function (objects, container) {
     console.log('start draw');
-    var el = document.getElementById('content');
-    el.innerHTML = '';
+    container.innerHTML = ''; /* should we really clear *here*? might need to remove when doing layer and moving cleaning + multi layer rendering somewhere else */
 
-    for (let object in objects) {
+    for (let object of objects) {
       var objEl = createElementAt(object.point.x, object.point.y);
+      console.log('rendering a: ' + object.type);
       renderers[object.type](object, objEl);
+      container.appendChild(objEl);
     }
     console.log('end draw');
   };

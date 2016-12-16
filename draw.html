@@ -1,0 +1,16 @@
+<html>
+  <div id="game">
+  </div>
+  <script src="draw.js"></script>
+  <script>
+var container = document.getElementById('game');
+var objects = [
+  {type: 'player', point: {x: 1, y: 1}},
+  {type: 'monster', point: {x: 0, y: 1}},
+  {type: 'monster', point: {x: 1, y: 2}},
+  {type: 'monster', point: {x: 1, y: 0}},
+  {type: 'monster', point: {x: 2, y: 1}},
+];
+draw(objects, container);
+  </script>
+</html>
