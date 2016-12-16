@@ -1,13 +1,21 @@
 <html>
 <header>
     <title>tic-tactics</title>
+    <script
+        src="https://code.jquery.com/jquery-3.1.1.min.js"
+        integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+        crossorigin="anonymous"></script>
+    
     <script src="https://www.gstatic.com/firebasejs/3.6.4/firebase.js"></script>
     <script src="comms.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
 </header>
 
 <body onload="initComms()">
     <h1>tic-tactics</h1>
-    <div class="board">
+    <div id="board">
+    </div>
+    <div id="games">
     </div>
 </body>
 </html>

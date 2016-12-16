@@ -8,7 +8,7 @@ function initComms() {
             console.log('signed in as ' + user.uid);
 
             firebase.database().ref('games').on("child_added", function(data) {
-                alert("new game has started!");
+                $("#games").append($("<div></div>").text(data.val()));
             }, function (errorObject) {
                 console.log("The read failed: " + errorObject.code);
             });
