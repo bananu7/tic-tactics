@@ -1,4 +1,4 @@
-var placement = function (units, objects, placementContainer) {
+var placement = function (units, objects, container, placementContainer) {
   var picker = document.createElement('ul');
 
   var selectedUnit;
@@ -20,8 +20,8 @@ var placement = function (units, objects, placementContainer) {
 
       object.type = 'unit';
       object.unitType = selectedUnit;
-      /* TODO trigger draw *SOME OTHER WAY* */
-      draw(objects, container /* this is the global one, LOL */);
+      /* XXX I'd like to find some CLEANER way than calling draw manually */
+      draw(objects, container);
     };
   }
   
