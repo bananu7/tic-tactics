@@ -1,5 +1,7 @@
 "use strict";
 
+var userId;
+
 function initComms() {
     // Initialize Firebase
     var config = {
@@ -16,6 +18,7 @@ function initComms() {
     firebase.auth().onAuthStateChanged(function(user) {
         if (user) {        
             console.log('signed in as ' + user.uid);
+            userId = user.uid;
             attachUpdateHooks();
         } else {
             firebase.auth().signInWithEmailAndPassword('example@example.com', 'example').catch(function(error) {
@@ -45,19 +48,64 @@ function newGameDiv(data) {
                 .attr("href", "#")
                 .on("click", function() {
                     var gameWindow = window.open("draw.html");
-                    gameWindow.connection = makeGameConnection(data);
+                    gameWindow.connection = new GameConnection(data);
                     window.gw = gameWindow;
                 })
         );
     return elem;
 }
 
-function makeGameConnection(gameData) {
-    return {
-        annoyVen: function() {
-            console.log("ven is annoyed")
+// This object is passed to the game window
+function GameConnection(gameData) {
+    //this.gameDate = gameData;
+    this.gameDbRef = firebase.database().ref("games").child(gameData.key);
+    this.playerId = userId;
+}
+GameConnection.prototype.placeUnit = function(unit) {
+    this.gameDbRef.child("units").push(unit);
+};
+GameConnection.prototype.getGameState = function() {
+    return this.gameDbRef.child("state").once("value");
+}
+GameConnection.prototype.lockIn = function() {
+    this.gameDbRef.child("players").child(this.playerId).child("lockedIn").set("true");
+    this.gameDbRef.child("players").once("value").then(function(data) {
+        var playerList = data.val();
+        // if all players have locked in
+        if (playerList.filter(p => !p.lockedIn).length == 0
+            && 
+            playerList.length >= 2) {
+            this.startPlay(playerList);
         }
-    };
+    });
+}
+GameConnection.prototype.onGameStateChanged = function(cb) {
+    this.gameDbRef.child("state").on("value", cb);
+}
+GameConnection.prototype.onYourTurn = function(cb) {
+    this.gameDbRef.child("currentPlayer")
+}
+GameConnection.prototype.onActionHappened = function() {
+    this.gameDbRef.child("actions").on("child_added", cb);
+}
+GameConnection.prototype.makeAction = function(action) {
+    this.gameDbRef.child("actions").push().set(action);
+}
+
+// Makes you a part of the game
+GameConnection.prototype.joinGame = function() {
+    this.gameDbRef.child("players").child("this.playerId").set({ 
+        joined: true,
+        lockedIn: false
+    });
+}
+// Closes the lobby
+GameConnection.prototype.startGame = function() {
+    // The game starts by unit placement
+    this.gameDbRef.child("state").set("placement");
+}
+GameConnection.prototype.startPlay = function(playerList) {
+    this.gameDbRef.child("currentPlayer").set(playerList[0]);
 }
 
 // Actual communication logic
@@ -66,10 +114,13 @@ function createNewGame() {
     var newGameObject = {
         owner: firebase.auth().currentUser.displayName,
         objects: [],
+        state: "lobby",
+        players: [],
+        // this has to be set to random player once the game starts
+        currentPlayer: null,
         // just to guarantee the goddamn thing actually creates
-        token: "token"
+        token: "token",        
     };
-
 
     firebase.database().ref('games').push().set(newGameObject);
 }
