@@ -33,3 +33,12 @@ var config = {
 };
 firebase.initializeApp(config);
 
+
+
+// Actual communication logic
+
+function createNewGame() {
+    var newGameRef = firebase.database().ref('games').push();
+    newGameRef.owner = firebase.auth().currentUser.displayName;
+}
+
