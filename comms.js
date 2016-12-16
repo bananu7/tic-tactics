@@ -37,13 +37,28 @@ function attachUpdateHooks() {
 }
 
 function newGameDiv(data) {
-    var elem = $("<div></div>");    
-    elem.addClass("game");
-    elem.append($("<h1></h1>").text(data.key));
-    elem.append($("<a>join!</a>").attr("href", "/draw.html&id=" + data.val));
+    var elem = $("<div></div>")
+        .addClass("game")
+        .append($("<h1></h1>").text(data.key))
+        .append(
+            $("<a>join!</a>")
+                .attr("href", "#")
+                .on("click", function() {
+                    var gameWindow = window.open("draw.html");
+                    gameWindow.connection = makeGameConnection(data);
+                    window.gw = gameWindow;
+                })
+        );
     return elem;
 }
 
+function makeGameConnection(gameData) {
+    return {
+        annoyVen: function() {
+            console.log("ven is annoyed")
+        }
+    };
+}
 
 // Actual communication logic
 
