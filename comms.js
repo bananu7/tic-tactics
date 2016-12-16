@@ -63,7 +63,14 @@ function makeGameConnection(gameData) {
 // Actual communication logic
 
 function createNewGame() {
-    var newGameRef = firebase.database().ref('games').push();
-    newGameRef.owner = firebase.auth().currentUser.displayName;
+    var newGameObject = {
+        owner: firebase.auth().currentUser.displayName,
+        objects: [],
+        // just to guarantee the goddamn thing actually creates
+        token: "token"
+    };
+
+
+    firebase.database().ref('games').push().set(newGameObject);
 }
 
