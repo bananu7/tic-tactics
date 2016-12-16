@@ -1,0 +1,29 @@
+<html>
+  <div id="game">
+  </div>
+  <div id="unit-list">
+  </div>
+  <script src="draw.js"></script>
+  <script src="placement.js"></script>
+  <script>
+var container = document.getElementById('game');
+var objects = [
+  {type: 'marker', point: {x: 0, y: 0}},
+  {type: 'marker', point: {x: 1, y: 0}},
+  {type: 'marker', point: {x: 0, y: 1}},
+  {type: 'marker', point: {x: 1, y: 1}},
+
+  {type: 'marker', point: {x: 3, y: 0}},
+  {type: 'marker', point: {x: 4, y: 0}},
+  {type: 'marker', point: {x: 3, y: 1}},
+  {type: 'marker', point: {x: 4, y: 1}},
+];
+
+var units = ['warrior', 'archer'];
+var unitSelector = document.getElementById('unit-list');
+placement(units, objects, unitSelector);
+
+draw(objects, container);
+  </script>
+</html>
+

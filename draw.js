@@ -18,11 +18,15 @@ var draw = function () {
   }
 
   var renderers = {
-    player: function (object, el) {
-      el.style.backgroundColor = 'red';
+    marker: function (object, el) {
+      el.style.backgroundColor = 'blue';
+    },
+    unit: function (object, el) {
+      el.style.backgroundColor = 'green';
+      el.innerHTML = object.unitType;
     },
     monster: function (object, el) {
-      el.style.backgroundColor = 'green';
+      el.style.backgroundColor = 'red';
     }
   };
 
@@ -34,8 +38,16 @@ var draw = function () {
       var objEl = createElementAt(object.point.x, object.point.y);
       console.log('rendering a: ' + object.type);
       renderers[object.type](object, objEl);
+      objEl.onclick = function () {
+        if (typeof object.callback == 'function') {
+          object.callback();
+        }
+      };
       container.appendChild(objEl);
     }
+    /* TODO remove this, get better at the css. this is here so that the #unit-list container doesn't appear "under" (z-index style) the objects */
+    container.style.width = TILE_WIDTH * (1 + Math.max(...objects.map(o => o.point.x)));
+    container.style.height = TILE_HEIGHT * (1 + Math.max(...objects.map(o => o.point.y)));
     console.log('end draw');
   };
 
