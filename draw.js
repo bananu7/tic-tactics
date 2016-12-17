@@ -5,7 +5,7 @@ var draw = function () {
 
   function createElementAt(x, y) {
     var el = document.createElement('div');
-    el.style.position = 'fixed'; /* TODO probably wants to be relative;, to refer to parent DOM object. not relevant with a single DOM object tho */
+    el.style.position = 'fixed'; /* TODO probably wants to be relative;, to refer to parent DOM object */
     el.style.display = 'block'; /* each element takes full width */
 
     el.style.width = TILE_WIDTH;
