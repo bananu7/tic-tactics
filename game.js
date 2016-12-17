@@ -3,6 +3,7 @@ function joinGame() {
 }
 
 function lockIn() {
+    $("#lock-in-button").attr("disabled", true);
     connection.lockIn();
 }
 
