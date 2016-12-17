@@ -47,7 +47,7 @@ function newGameDiv(data) {
             $("<a>join!</a>")
                 .attr("href", "#")
                 .on("click", function() {
-                    var gameWindow = window.open("draw.html");
+                    var gameWindow = window.open("place.html");
                     gameWindow.connection = new GameConnection(data);
                     window.gw = gameWindow;
                 })
@@ -83,13 +83,30 @@ GameConnection.prototype.onGameStateChanged = function(cb) {
     this.gameDbRef.child("state").on("value", cb);
 }
 GameConnection.prototype.onYourTurn = function(cb) {
-    this.gameDbRef.child("currentPlayer")
+    this.gameDbRef.child("currentPlayer").on("value", function(data) {
+        if (data.val() = this.playerId) {
+            cb();
+        }
+    });
 }
 GameConnection.prototype.onActionHappened = function() {
     this.gameDbRef.child("actions").on("child_added", cb);
 }
 GameConnection.prototype.makeAction = function(action) {
     this.gameDbRef.child("actions").push().set(action);
+}
+GameConnection.prototype.endTurn = function() {
+    this.gameDbRef.child("players").once("value", function(data) {
+        var playerList = data.val();
+        this.gameDbRef.child("currentPlayer").once("value", function(data) {
+            var currentPlayer = data.val();
+            var currentPlayerId = playerList.indexOf(currentPlayer);
+            var nextPlayerId = currentPlayerId + 1;
+            if (nextPlayerId >= playerList.length) {
+                nextPlayerId = 0;
+            }
+        });
+    });
 }
 
 // Makes you a part of the game
@@ -104,7 +121,7 @@ GameConnection.prototype.startGame = function() {
     // The game starts by unit placement
     this.gameDbRef.child("state").set("placement");
 }
-GameConnection.prototype.startPlay = function(playerList) {
+GameConnection.prototype.startPlay = function() {
     this.gameDbRef.child("currentPlayer").set(playerList[0]);
 }
 
