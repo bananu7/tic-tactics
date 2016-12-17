@@ -37,12 +37,17 @@ function attachUpdateHooks() {
     }, function (errorObject) {
         console.log("The read failed: " + errorObject.code);
     });
+
+    firebase.database().ref('games').on("child_removed", function(data) {
+        $("#" + data.key).parent().remove();
+    });
 }
 
 function newGameDiv(data) {
     var elem = $("<div></div>")
         .addClass("game")
         .append($("<h1></h1>").text(data.val().name))
+        .append($("<span></span>").css("visibility", "hidden").attr("id", data.key))
         .append(
             $("<a>Open!</a>")
                 .attr("href", "#")
