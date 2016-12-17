@@ -25,14 +25,14 @@ var placement = function ({units, objects, redraw, unitListEl, end, money}) {
   lockButton.innerHTML = 'GO';
   lockButton.onclick = function (e) {
     e.preventDefault();
-    if (objects.filter(o => o.type !== 'marker')) {
+    if (objects.filter(o => o.type !== 'marker').length == 0) {
       alert("You need to place your units");
       return;
     }
     locked = true;
 
     unitListEl.removeChild(picker);
-    end(objects.filter(o => o.type !== 'marker'));
+    end();
   };
   picker.appendChild(lockButton);
 

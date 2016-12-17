@@ -46,8 +46,10 @@ function startGame(gameConfig, container) {
     redraw();
 
     // start the game in placement mode.
-    placement({units, objects, unitListEl, redraw, money, end: function (objects) {
+    placement({units, objects, unitListEl, redraw, money, end: function (_objects) {
       console.log('done placing');
+      objects = objects.filter(o => o.type !== 'marker');
       container.removeChild(unitListEl);
+      redraw();
     }});
 }
