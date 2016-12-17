@@ -4,6 +4,7 @@ function joinGame() {
 
 function leaveGame() {
     connection.leaveGame();
+    window.close();
 }
 
 function lockIn() {
@@ -19,4 +20,8 @@ function endTurn() {
 
 connection.onYourTurn(function() {
     $("#end-turn-button").attr("disabled", false);
+});
+
+connection.onGameStateChanged(function(newState) {
+    $("#game-state").text(newState);
 });
