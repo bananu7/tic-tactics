@@ -1,6 +1,6 @@
 "use strict";
 
-var userId;
+var currentUser;
 
 function initComms() {
     // Initialize Firebase
@@ -18,7 +18,7 @@ function initComms() {
     firebase.auth().onAuthStateChanged(function(user) {
         if (user) {        
             console.log('signed in as ' + user.uid);
-            userId = user.uid;
+            currentUser = user;
             attachUpdateHooks();
         } else {
             firebase.auth().signInWithEmailAndPassword('example@example.com', 'example').catch(function(error) {
@@ -42,9 +42,9 @@ function attachUpdateHooks() {
 function newGameDiv(data) {
     var elem = $("<div></div>")
         .addClass("game")
-        .append($("<h1></h1>").text(data.key))
+        .append($("<h1></h1>").text(data.val().name))
         .append(
-            $("<a>join!</a>")
+            $("<a>Open!</a>")
                 .attr("href", "#")
                 .on("click", function() {
                     var gameWindow = window.open("place.html");
@@ -59,7 +59,7 @@ function newGameDiv(data) {
 function GameConnection(gameData) {
     //this.gameDate = gameData;
     this.gameDbRef = firebase.database().ref("games").child(gameData.key);
-    this.playerId = userId;
+    this.playerId = currentUser.uid;
 }
 GameConnection.prototype.placeUnit = function(unit) {
     this.gameDbRef.child("units").push(unit);
@@ -128,15 +128,21 @@ GameConnection.prototype.startPlay = function() {
 // Actual communication logic
 
 function createNewGame() {
+    var startingPlayers = {};
+    startingPlayers[currentUser.uid] = { joined: true };
+
     var newGameObject = {
         owner: firebase.auth().currentUser.displayName,
         objects: [],
+        name: currentUser.email + "'s game",
         state: "lobby",
-        players: [],
+        // you automatically join games you create
+        // mostly to prevent them from being automatically cleared
+        players: startingPlayers,
         // this has to be set to random player once the game starts
         currentPlayer: null,
         // just to guarantee the goddamn thing actually creates
-        token: "token",        
+        token: "token",
     };
 
     firebase.database().ref('games').push().set(newGameObject);
