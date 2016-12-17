@@ -83,8 +83,8 @@ GameConnection.prototype.onGameStateChanged = function(cb) {
     this.gameDbRef.child("state").on("value", cb);
 }
 GameConnection.prototype.onYourTurn = function(cb) {
-    this.gameDbRef.child("currentPlayer").on("value", function(data) {
-        if (data.val() = this.playerId) {
+    this.gameDbRef.child("currentPlayer").on("value", (data) => {
+        if (data.val() == this.playerId) {
             cb();
         }
     });
@@ -96,16 +96,17 @@ GameConnection.prototype.makeAction = function(action) {
     this.gameDbRef.child("actions").push().set(action);
 }
 GameConnection.prototype.endTurn = function() {
-    this.gameDbRef.child("players").once("value", function(data) {
-        var playerList = data.val();
-        this.gameDbRef.child("currentPlayer").once("value", function(data) {
-            var currentPlayer = data.val();
-            var currentPlayerId = playerList.indexOf(currentPlayer);
-            var nextPlayerId = currentPlayerId + 1;
-            if (nextPlayerId >= playerList.length) {
-                nextPlayerId = 0;
+    this.gameDbRef.transaction(function(game) {
+        if (game.state == "play") {
+            var currentPlayerIndex = game.players.indexOf(game.currentPlayer);
+            var nextPlayerIndex = currentPlayerId + 1;
+            if (nextPlayerIndex >= game.players.length) {
+                nextPlayerIndex = 0;
             }
-        });
+
+            game.currentPlayer = game.players[nextPlayerIndex];
+            return game;
+        }
     });
 }
 
@@ -122,7 +123,10 @@ GameConnection.prototype.startGame = function() {
     this.gameDbRef.child("state").set("placement");
 }
 GameConnection.prototype.startPlay = function() {
-    this.gameDbRef.child("currentPlayer").set(playerList[0]);
+    this.gameDdRef.transaction(function(game) {
+        game.currentPlayer = playerList[0];
+        game.state = "play";
+    });
 }
 
 // Actual communication logic
