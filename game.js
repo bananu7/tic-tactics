@@ -2,6 +2,10 @@ function joinGame() {
     connection.joinGame();
 }
 
+function leaveGame() {
+    connection.leaveGame();
+}
+
 function lockIn() {
     $("#lock-in-button").attr("disabled", true);
     connection.lockIn();

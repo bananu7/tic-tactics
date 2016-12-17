@@ -68,16 +68,33 @@ GameConnection.prototype.getGameState = function() {
     return this.gameDbRef.child("state").once("value");
 }
 GameConnection.prototype.lockIn = function() {
-    this.gameDbRef.child("players").child(this.playerId).child("lockedIn").set("true");
-    this.gameDbRef.child("players").once("value").then(function(data) {
-        var playerList = data.val();
-        // if all players have locked in
-        if (playerList.filter(p => !p.lockedIn).length == 0
-            && 
-            playerList.length >= 2) {
-            this.startPlay(playerList);
+    this.gameDbRef.transaction((game) => {
+        if (game.state != "placement")
+            return;
+
+        game.players[this.playerId].lockedIn = true;
+
+        var allLockedIn = true;
+        var numberOfPlayers = 0;
+
+        for (var playerId in game.players) {
+            if (!object.hasOwnProperty(playerId))
+                continue;
+
+            if (!game.players[playerId].lockedIn) {
+                allLockedIn = false;
+                break;
+            }
+
+            numberOfPlayers += 1;
         }
+
+        if (numberOfPlayers >= 2 && allLockedIn) {
+            this.startPlay();
+        }
+        return game;
     });
+
 }
 GameConnection.prototype.onGameStateChanged = function(cb) {
     this.gameDbRef.child("state").on("value", cb);
@@ -97,18 +114,35 @@ GameConnection.prototype.makeAction = function(action) {
 }
 GameConnection.prototype.endTurn = function() {
     this.gameDbRef.transaction(function(game) {
-        if (game.state == "play") {
-            var currentPlayerIndex = game.players.indexOf(game.currentPlayer);
-            var nextPlayerIndex = currentPlayerId + 1;
-            if (nextPlayerIndex >= game.players.length) {
-                nextPlayerIndex = 0;
-            }
+        if (game.state != "play")
+            return;
 
-            game.currentPlayer = game.players[nextPlayerIndex];
-            return game;
+        var currentPlayerIndex = game.players.indexOf(game.currentPlayer);
+        var nextPlayerIndex = currentPlayerId + 1;
+        if (nextPlayerIndex >= game.players.length) {
+            nextPlayerIndex = 0;
         }
+
+        game.currentPlayer = game.players[nextPlayerIndex];
+        return game;
     });
 }
+GameConnection.prototype.leaveGame = function() {
+    this.gameDbRef.transaction((game) => {
+        delete game.players[this.playerId];
+
+        for (var playerId in game.players) {
+            if (!object.hasOwnProperty(playerId))
+                continue;
+
+            // If there's a player in the game still, just leave it be
+            return game;
+        }
+
+        // If no players has kept the game alive, remove it
+        return null;
+    });
+};
 
 // Makes you a part of the game
 GameConnection.prototype.joinGame = function() {
@@ -132,6 +166,8 @@ GameConnection.prototype.startPlay = function() {
 // Actual communication logic
 
 function createNewGame() {
+    // you automatically join games you create
+    // mostly to prevent them from being automatically cleared
     var startingPlayers = {};
     startingPlayers[currentUser.uid] = { joined: true };
 
@@ -140,8 +176,6 @@ function createNewGame() {
         objects: [],
         name: currentUser.email + "'s game",
         state: "lobby",
-        // you automatically join games you create
-        // mostly to prevent them from being automatically cleared
         players: startingPlayers,
         // this has to be set to random player once the game starts
         currentPlayer: null,
