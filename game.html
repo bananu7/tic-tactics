@@ -1,10 +1,21 @@
 <html>
+  <head>
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+
+    <script
+      src="https://code.jquery.com/jquery-3.1.1.min.js"
+      integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+      crossorigin="anonymous"></script>
+  </head>
+
   <div id="game">
   </div>
   <div id="unit-list">
   </div>
   <script src="draw.js"></script>
   <script src="placement.js"></script>
+  <script src="game.js"></script>
   <script>
 var container = document.getElementById('game');
 var objects = [
@@ -25,5 +36,11 @@ placement(units, objects, container, unitSelector);
 
 draw(objects, container);
   </script>
+
+  <div id="sidebar">
+    <input type="button" value="Join This Game" onclick="joinGame()">
+    <input type="button" value="Lock In" onclick="lockIn()">
+    <input type="button" value="End Turn" onclick="endTurn()">
+  </div>
 </html>
 

@@ -16,3 +16,13 @@ div#games .game {
     padding: 10px;
     margin-bottom: 10px;
 }
+
+div#sidebar {
+    position: absolute;
+    right: 0;
+    width: 200px;
+    top: 10%;
+    height: 80%;
+    background-color: #ccc;
+    padding: 20px
+}

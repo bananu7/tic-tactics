@@ -47,7 +47,7 @@ function newGameDiv(data) {
             $("<a>Open!</a>")
                 .attr("href", "#")
                 .on("click", function() {
-                    var gameWindow = window.open("place.html");
+                    var gameWindow = window.open("game.html");
                     gameWindow.connection = new GameConnection(data);
                     window.gw = gameWindow;
                 })
